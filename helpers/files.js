@@ -3,17 +3,19 @@
 const fs = require('fs');
 
 const readUsersData = (filePath) => {
-  return fs.promises.readFile(filePath)
+  const usersData = fs.promises.readFile(filePath)
     .then((file) => {
       return JSON.parse(file);
     });
+  return usersData;
 };
 
 const readCardsData = (filePath) => {
-  return fs.promises.readFile(filePath)
+  const cardsData = fs.promises.readFile(filePath)
     .then((file) => {
       return JSON.parse(file);
     });
+  return cardsData;
 };
 
 module.exports = { readUsersData, readCardsData };

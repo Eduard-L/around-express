@@ -11,14 +11,10 @@ const getUsersData = async (req, res) => {
     const users = await readUsersData(usersFilePath);
     if (users) {
       res.send(users);
-    }
-
-    else {
+    } else {
       res.send('users are not found');
     }
-  }
-
-  catch (e) {
+  } catch (e) {
     res.status(500).send({ 'message': 'some thing went wrong with the server' });
     console.log('error happened in getting users');
   }
@@ -31,16 +27,13 @@ const getUserById = async (req, res) => {
 
     if (user) {
       res.send(user);
-    }
-
-    else {
+    } else {
       res.status(404).send({ 'message': 'User ID not found' });
     }
-  }
-  catch (e) {
+  } catch (e) {
     console.log('error happened in getting user');
     res.status(500).send({ 'message': 'some thing went wrong with the server' });
-  };
-}
+  }
+};
 
 module.exports = { getUsersData, getUserById };
