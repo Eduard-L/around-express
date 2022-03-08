@@ -1,15 +1,15 @@
 // handlers for sending data to the user // async opertaion
-const path = require('path');
 
-const cardsFilePath = path.join(__dirname, '..', 'data', 'cards.json');
+const Card = require('../models/card')
 
-const { readCardsData } = require('../helpers/files');
+const NOTFOUND_CODE = 404;
+const VALIDATION_CODE = 400;
 
 const getCards = async (req, res) => {
   try {
-    const cardsData = await readCardsData(cardsFilePath);
+    const cardsData = await Card.find({});
     if (cardsData) {
-      res.send(cardsData);
+      res.status(200).send(cardsData);
     } else {
       res.send('something went wrong with the cards data');
     }
@@ -19,18 +19,107 @@ const getCards = async (req, res) => {
 };
 
 const getCardsById = async (req, res) => {
+  const id = req.params.id;
   try {
-    const cardsData = await readCardsData(cardsFilePath);
-    const card = cardsData.find((c) => c._id === req.params.id);
-
+    const card = await Card.findById(id);
     if (card) {
-      res.send(card);
+      res.status(200).send(card);
     } else {
-      res.status(404).send('{ message: card is not found }');
+      res.send('something went wrong with find the card');
     }
   } catch (e) {
+    if (e.name === "CastError") {
+      res.status(NOTFOUND_CODE).json("card has not found")
+      return;
+    }
     res.status(500).send('{ message: something went wrong with the server }');
   }
 };
 
-module.exports = { getCards, getCardsById };
+const createCard = async (req, res) => {
+  const userId = req.user._id;
+  const { name, link } = req.body;
+  try {
+    const card = await Card.create({ name: name, link: link, owner: userId })
+    if (card) {
+      res.status(200).send(card)
+    }
+    else {
+      res.json('somtething went wrong with card creation')
+
+    }
+  }
+  catch (e) {
+    if (e.name === 'ValidationError') {
+      res.status(VALIDATION_CODE).json('you have sent a wrong info to the server')
+      return;
+    }
+    res.status(500).send("something wrong with server")
+
+  }
+}
+
+const deleteCard = async (req, res) => {
+  const id = req.params.id
+
+  try {
+    const deleteCard = await Card.findByIdAndDelete(id)
+
+    if (deleteCard) {
+      res.status(200).json(`{your card has been deleted : ${deleteCard}}`)
+    }
+    else {
+      res.send("error while deleting card")
+    }
+  }
+  catch (e) {
+    res.status(500).send("server error")
+  }
+}
+const likeCard = async (req, res) => {
+  try {
+    const like = await Card.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
+      { new: true })
+
+    if (like) {
+      res.status(200).send(like)
+
+    }
+    else {
+      res.send('something went wrong with your like ');
+    }
+
+  }
+  catch (e) {
+    res.status(500).send(e)
+  }
+
+}
+
+
+const disLikeCard = async (req, res) => {
+  try {
+    const like = await Card.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { likes: req.user._id } }, // add _id to the array if it's not there yet
+      { new: true })
+
+    if (like) {
+      res.status(200).send(like)
+
+    }
+    else {
+      res.send('something went wrong with the dislike ');
+    }
+
+  }
+  catch (e) {
+    res.status(500).send(e)
+  }
+
+}
+
+
+module.exports = { getCards, getCardsById, createCard, deleteCard, likeCard, disLikeCard };
