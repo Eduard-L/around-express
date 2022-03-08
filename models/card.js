@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
 
-const User = require('./user')
-
-
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -16,12 +13,10 @@ const cardSchema = new mongoose.Schema({
     validate: {
 
       validator(v) {
-
         return /https?:\/\/[www.]?\S+/gi.test(v);
+      },
 
-      }
-
-    }
+    },
   },
   owner: {
     required: true,
@@ -37,8 +32,8 @@ const cardSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  }
+  },
 
-})
+});
 
 module.exports = mongoose.model('card', cardSchema);

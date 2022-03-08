@@ -21,16 +21,12 @@ const userSchema = new mongoose.Schema({
     validate: {
 
       validator(v) {
-
         return /https?:\/\/[www.]?\S+/gi.test(v);
-
-      }
+      },
 
     },
-  }
+  },
 
-
-
-})
+});
 
 module.exports = mongoose.model('user', userSchema);
