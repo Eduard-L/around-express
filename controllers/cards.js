@@ -24,11 +24,9 @@ const getCardsById = async (req, res) => {
     const card = await Card.findById(id);
     if (card) {
       res.status(200).send(card);
-    }
-    else if (card === null) {
-      res.status(NOTFOUND_CODE).json('wrong id card is not found')
-    }
-    else {
+    } else if (card === null) {
+      res.status(NOTFOUND_CODE).json('wrong id card is not found');
+    } else {
       res.status(VALIDATION_CODE).send('something went wrong with find the card');
     }
   } catch (e) {

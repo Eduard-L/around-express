@@ -26,19 +26,16 @@ const getUserById = async (req, res) => {
 
     if (user) {
       res.status(200).send(user);
-    }
-    else if (user === null) {
-      res.status(NOTFOUND_CODE).json('User has not found !')
-    }
-    else {
+    } else if (user === null) {
+      res.status(NOTFOUND_CODE).json('User has not found !');
+    } else {
       res.status(VALIDATION_CODE).send('something went wrong with find the user ');
     }
   } catch (e) {
     if (e.name === 'CastError') {
       res.status(VALIDATION_CODE).json('you are trying to search for wrong id length');
-      return
+      return;
     }
-
 
     res.status(500).send('{ message: some thing went wrong with the server }');
   }
