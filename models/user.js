@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     validate: {
 
       validator(v) {
-        return myVal.isURL(v, { require_protocol: true, allow_underscores: true })
+        return myVal.isURL(v, { require_protocol: true, allow_underscores: true });
       },
 
     },
