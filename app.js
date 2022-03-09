@@ -4,7 +4,9 @@ const mongoose = require('mongoose');
 
 const helmet = require('helmet');
 
-const boydParser = require('body-parser');
+const bodyParser = require('body-parser');
+
+// const mainRouter = require('./routes/index')
 
 const { cardsRouter } = require('./routes/cards');
 const { usersRouter } = require('./routes/users');
@@ -14,7 +16,7 @@ const app = express();
 
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
-app.use(boydParser.json());
+app.use(bodyParser.json());
 
 app.use(helmet());
 
@@ -30,6 +32,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// app.use((req, res, next) => {
+//   mainRouter();
+//   next()
+// })
+
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use(nonExcistPage);
@@ -37,3 +44,5 @@ app.use(nonExcistPage);
 app.listen(PORT, () => {
   console.log(`everything works at port ${PORT}`);
 });
+
+// module.exports = app

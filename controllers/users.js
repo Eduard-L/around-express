@@ -4,6 +4,7 @@ const User = require('../models/user');
 
 const NOTFOUND_CODE = 404;
 const VALIDATION_CODE = 400;
+const DEFAULTERROR_CODE = 500;
 
 const getUsersData = async (req, res) => {
   try {
@@ -11,33 +12,31 @@ const getUsersData = async (req, res) => {
     if (users) {
       res.status(200).send(users);
     } else {
-      res.send('something went wrong with the users');
+      res.status(VALIDATION_CODE).send({ message: 'something went wrong with the users' });
     }
   } catch (e) {
-    res.status(500).send('{ message: some thing went wrong with the server }');
+    res.status(DEFAULTERROR_CODE).send({ message: 'some thing went wrong with the server ' });
   }
 };
 
 const getUserById = async (req, res) => {
-  console.log(req.params);
-
   try {
     const user = await User.findById(req.params.id);
 
     if (user) {
       res.status(200).send(user);
     } else if (user === null) {
-      res.status(NOTFOUND_CODE).json('User has not found !');
+      res.status(NOTFOUND_CODE).json({ message: 'User has not found !' });
     } else {
-      res.status(VALIDATION_CODE).send('something went wrong with find the user ');
+      res.status(VALIDATION_CODE).send({ message: 'something went wrong with find the user ' });
     }
   } catch (e) {
     if (e.name === 'CastError') {
-      res.status(VALIDATION_CODE).json('you are trying to search for wrong id length');
+      res.status(VALIDATION_CODE).json({ message: 'you are trying to search for wrong id length' });
       return;
     }
 
-    res.status(500).send('{ message: some thing went wrong with the server }');
+    res.status(DEFAULTERROR_CODE).send({ message: 'some thing went wrong with the server ' });
   }
 };
 
@@ -46,16 +45,16 @@ const createUser = async (req, res) => {
   try {
     const newUser = await User.create({ name, about, avatar });
     if (newUser) {
-      res.status(200).send(newUser);
+      res.status(201).send(newUser);
     } else {
-      res.json('something went wrong with user creation');
+      res.status(VALIDATION_CODE).json({ message: 'something went wrong with user creation' });
     }
   } catch (e) {
     if (e.name === 'ValidationError') {
-      res.status(VALIDATION_CODE).json('you have sent a invalid info to the server');
+      res.status(VALIDATION_CODE).json({ message: 'you have sent a invalid info to the server' });
       return;
     }
-    res.status(500).json('something went wrong with user creation');
+    res.status(DEFAULTERROR_CODE).json({ message: 'something went wrong with user creation' });
   }
 };
 
@@ -64,14 +63,30 @@ const updateUserInfo = async (req, res) => {
   const { name, about } = req.body;
 
   try {
-    const updateInfo = await User.findByIdAndUpdate(userId, { name, about });
+    const updateInfo = await User.findByIdAndUpdate(
+      userId,
+      { name, about },
+      { runValidators: true },
+    );
     if (updateInfo && (name || about)) {
-      res.status(200).send('the user Info updated successfully');
+      res.status(200).send({ message: 'the user Info updated successfully' });
+    } else if (userId !== '622330c03848c6c39908c775') {
+      res.status(NOTFOUND_CODE).json({
+        message: 'the user that you are trying to update is no longer excist',
+      });
     } else {
-      res.send('something went wrong with the update');
+      res.status(VALIDATION_CODE).send({ message: 'something went wrong with the update' });
     }
   } catch (e) {
-    res.status(500).send(`something went wrong with the backend, ${e}`);
+    if (e.name === 'CastError') {
+      res.status(VALIDATION_CODE).json({ message: 'you passing invalid user id, please try again' });
+      return;
+    }
+    if (e.name === 'ValidationError') {
+      res.status(VALIDATION_CODE).send({ message: 'your info is invalid , please try again!' });
+      return;
+    }
+    res.status(DEFAULTERROR_CODE).send({ message: `something went wrong with the backend, ${e}` });
   }
 };
 
@@ -80,14 +95,24 @@ const updateUserAvatar = async (req, res) => {
   const { avatar } = req.body;
 
   try {
-    const updateInfo = await User.findByIdAndUpdate(userId, { avatar });
+    const updateInfo = await User.findByIdAndUpdate(userId, { avatar }, { runValidators: true });
     if (updateInfo && avatar) {
-      res.status(200).send('the user avatar updated successfully');
+      res.status(200).send({ message: 'the user avatar updated successfully' });
+    } else if (userId !== '622330c03848c6c39908c775') {
+      res.status(NOTFOUND_CODE).json({ message: 'the user that you are trying to update is no longer excist' });
     } else {
-      res.send('something went wrong with the update avatar');
+      res.status(VALIDATION_CODE).send({ message: 'something went wrong with the update avatar' });
     }
   } catch (e) {
-    res.status(500).send(`something went wrong with the backend, ${e}`);
+    if (e.name === 'CastError') {
+      res.status(VALIDATION_CODE).json({ message: 'you passing invalid user id, please try again' });
+      return;
+    }
+    if (e.name === 'ValidationError') {
+      res.status(VALIDATION_CODE).send({ message: 'your info is invalid , please try again!' });
+      return;
+    }
+    res.status(DEFAULTERROR_CODE).send({ message: `something went wrong with the backend, ${e}` });
   }
 };
 
@@ -98,12 +123,18 @@ const deleteUser = async (req, res) => {
     const deletingUser = await User.findByIdAndDelete(id);
 
     if (deletingUser) {
-      res.status(200).json(`{the user has been deleted : ${deletingUser}}`);
+      res.status(200).json({ message: `the user has been deleted : ${deletingUser}` });
+    } else if (deletingUser === null) {
+      res.status(NOTFOUND_CODE).json({ message: 'you are trying to delete user that not excist' });
     } else {
-      res.send('error while deleting user');
+      res.status(VALIDATION_CODE).send({ message: 'error while deleting user' });
     }
   } catch (e) {
-    res.status(500).send('server error');
+    if (e.name === 'CastError') {
+      res.status(VALIDATION_CODE).json({ message: 'you are sending invalid id to the server' });
+      return;
+    }
+    res.status(DEFAULTERROR_CODE).send({ message: 'server error' });
   }
 };
 module.exports = {

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const myVal = require('validator');
+
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -13,7 +15,7 @@ const cardSchema = new mongoose.Schema({
     validate: {
 
       validator(v) {
-        return /https?:\/\/[www.]?\S+/gi.test(v);
+        return myVal.isURL(v, { require_protocol: true, allow_underscores: true })
       },
 
     },

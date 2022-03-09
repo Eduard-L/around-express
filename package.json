@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "express": "^4.17.3",
     "helmet": "^5.0.2",
     "https": "^1.0.0",
-    "mongoose": "^6.2.4"
+    "mongoose": "^6.2.4",
+    "validator": "^13.7.0"
   }
 }
