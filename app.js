@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 
 const helmet = require('helmet');
 
+const { handleCors } = require('./middelwares/cors')
+
 const bodyParser = require('body-parser');
 
 const mainRouter = require('./routes/index');
@@ -30,6 +32,8 @@ app.use(helmet());
 app.disable('x-powered-by');
 
 const { PORT = 3000 } = process.env;
+
+app.use(handleCors)
 
 app.use((req, res, next) => {
   req.user = {
