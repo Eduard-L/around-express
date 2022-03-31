@@ -8,7 +8,7 @@ const DEFAULTERROR_CODE = 500;
 
 const getCards = async (req, res) => {
   try {
-    const cardsData = await Card.find({});
+    const cardsData = await Card.find({}).populate(['owner', 'likes']); // show the full info about the user in likes and owner
     if (cardsData) {
       res.status(200).send(cardsData);
     } else {
@@ -64,7 +64,7 @@ const deleteCard = async (req, res) => {
   try {
     const card = await Card.findByIdAndDelete(id);
     if (card) {
-      res.status(200).json({ message: `your card has been deleted : ${card}` });
+      res.status(200).json(card);
     } else if (card === null) {
       res.status(NOTFOUND_CODE).json({ message: 'you are trying to delete card that not excist' });
     } else {

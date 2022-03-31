@@ -1,15 +1,11 @@
-// const { cardsRouter } = require('./cards');
-// const { usersRouter } = require('./users');
-// const { nonExcistPage } = require('./notFound');
+const mainRouter = require('express').Router();
 
-// const app = require('../app')
+const { cardsRouter } = require('./cards');
+const { usersRouter } = require('./users');
+const { nonExcistPage } = require('./notFound');
 
-// const mainRouter = () => {
-//   app.use('/users', usersRouter);
-//   app.use('/cards', cardsRouter);
-//   app.use(nonExcistPage);
-//   next();
+mainRouter.use('/users', usersRouter);
+mainRouter.use('/cards', cardsRouter);
+mainRouter.use(nonExcistPage);
 
-// }
-
-// module.exports = mainRouter
+module.exports = mainRouter;

@@ -1,10 +1,14 @@
 // handlers for sending data to the user // async opertaion
+// const bcrypt = require('bcryptjs'); // importing bcrypt
+
+const jwt = require('jsonwebtoken'); // importing the jsonwebtoken module
 
 const User = require('../models/user');
 
 const NOTFOUND_CODE = 404;
 const VALIDATION_CODE = 400;
 const DEFAULTERROR_CODE = 500;
+const UNAUTHORIZED_CODE = 401;
 
 const getUsersData = async (req, res) => {
   try {
@@ -31,6 +35,7 @@ const getUserById = async (req, res) => {
       res.status(VALIDATION_CODE).send({ message: 'something went wrong with find the user ' });
     }
   } catch (e) {
+    console.log(e.name)
     if (e.name === 'CastError') {
       res.status(VALIDATION_CODE).json({ message: 'you are trying to search for wrong id length' });
       return;
@@ -66,10 +71,11 @@ const updateUserInfo = async (req, res) => {
     const updateInfo = await User.findByIdAndUpdate(
       userId,
       { name, about },
-      { runValidators: true },
+      { runValidators: true, new: true },
+
     );
     if (updateInfo && (name || about)) {
-      res.status(200).send({ message: 'the user Info updated successfully' });
+      res.status(200).send(updateInfo);
     } else if (userId !== '622330c03848c6c39908c775') {
       res.status(NOTFOUND_CODE).json({
         message: 'the user that you are trying to update is no longer excist',
@@ -123,7 +129,7 @@ const deleteUser = async (req, res) => {
     const deletingUser = await User.findByIdAndDelete(id);
 
     if (deletingUser) {
-      res.status(200).json({ message: `the user has been deleted : ${deletingUser}` });
+      res.status(200).json(deletingUser);
     } else if (deletingUser === null) {
       res.status(NOTFOUND_CODE).json({ message: 'you are trying to delete user that not excist' });
     } else {
@@ -137,6 +143,8 @@ const deleteUser = async (req, res) => {
     res.status(DEFAULTERROR_CODE).send({ message: 'server error' });
   }
 };
+
+
 module.exports = {
   deleteUser, getUsersData, getUserById, createUser, updateUserAvatar, updateUserInfo,
 };
